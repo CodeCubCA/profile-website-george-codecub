@@ -11,7 +11,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # Set page configuration
 st.set_page_config(
-    page_title="My Gaming AI Assistant",
+    page_title="George's Gaming Buddy",
     page_icon="🎮",
     layout="wide"
 )
@@ -47,7 +47,7 @@ if len(st.session_state.messages) == 0:
     })
 
 # App title and description
-st.title("🎮 My Gaming AI Assistant")
+st.title("🎮 George's Gaming Buddy")
 st.markdown("### Welcome, Gamer! 👋")
 st.markdown("""
 🎯 **What I Can Do For You:**
@@ -90,7 +90,7 @@ with st.sidebar:
 
     st.header("ℹ️ About")
     st.info("""
-    🎮 **My Gaming AI Assistant**
+    🎮 **George's Gaming Buddy**
 
     Powered by:
     - **Groq API** (llama-3.3-70b-versatile)
