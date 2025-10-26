@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>George - Developer Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h3>George</h3>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#skills" class="nav-link">Hobbies</a>
+                <a href="#space-game" class="nav-link">Space Defense</a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Hi, I'm <span class="highlight">George</span></h1>
+                        <h2>🎮 Gamer • ⚽ Soccer Player • 🏸 Sports Enthusiast</h2>
+                        <p class="hero-description">
+                            Welcome to my awesome world! I'm an 11-year-old grade 7 student who loves playing sports and gaming. Let's have some fun together!
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="#about" class="btn-primary">Learn About Me</a>
+                            <a href="#game" class="btn-secondary">Play My Game</a>
+                        </div>
+                    </div>
+                    <div class="hero-image">
+                        <div class="profile-card">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="floating-elements">
+                                <div class="floating-element" style="--delay: 0s">⚽</div>
+                                <div class="floating-element" style="--delay: 1s">🎮</div>
+                                <div class="floating-element" style="--delay: 2s">🏸</div>
+                                <div class="floating-element" style="--delay: 3s">🌟</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about">
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>
+                            Hi! I'm George, an 11-year-old boy in grade 7. I love playing video games and sports, especially soccer. I'm passionate about learning new things and having fun with my friends!
+                        </p>
+                        <div class="about-stats">
+                            <div class="stat">
+                                <h3>⚽ Love Soccer</h3>
+                                <p>My favorite sport</p>
+                            </div>
+                            <div class="stat">
+                                <h3>🎓 Grade 7 Student</h3>
+                                <p>11 years old</p>
+                            </div>
+                            <div class="stat">
+                                <h3>🎮 Gaming Enthusiast</h3>
+                                <p>Roblox & Fortnite</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <div class="about-card">
+                            <h3>What I'm Learning</h3>
+                            <ul>
+                                <li><i class="fas fa-graduation-cap"></i> School</li>
+                                <li><i class="fas fa-futbol"></i> Soccer</li>
+                                <li><i class="fas fa-table-tennis"></i> Badminton</li>
+                                <li><i class="fas fa-table-tennis"></i> Pickleball</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="skills">
+            <div class="container">
+                <h2 class="section-title">Hobbies</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3><i class="fas fa-futbol"></i> Sports</h3>
+                        <div class="skills-list">
+                            <span class="skill-tag">Soccer</span>
+                            <span class="skill-tag">Badminton</span>
+                            <span class="skill-tag">Pickleball</span>
+                        </div>
+                    </div>
+                    <div class="skill-category">
+                        <h3><i class="fas fa-gamepad"></i> Gaming</h3>
+                        <div class="skills-list">
+                            <span class="skill-tag">Roblox</span>
+                            <span class="skill-tag">Fortnite</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="space-game" class="game">
+            <div class="container">
+                <h2 class="section-title">🚀 Space Tower Defense</h2>
+                <div class="game-container">
+                    <div class="game-header">
+                        <h3>Defend the space station from alien invaders!</h3>
+                        <div class="game-stats">
+                            <div class="stat-item">
+                                <span id="spaceCredits">200</span>
+                                <small>Credits</small>
+                            </div>
+                            <div class="stat-item">
+                                <span id="spaceWave">1</span>
+                                <small>Wave</small>
+                            </div>
+                            <div class="stat-item">
+                                <span id="spaceShield">100</span>
+                                <small>Shield</small>
+                            </div>
+                        </div>
+                        <div class="game-controls">
+                            <button id="startSpaceGameBtn" class="btn-primary">Launch Defense</button>
+                            <button id="restartSpaceGameBtn" class="btn-secondary">Restart</button>
+                            <button id="fullscreenSpaceGameBtn" class="btn-secondary">Fullscreen</button>
+                        </div>
+                    </div>
+                    <div class="game-canvas-container">
+                        <canvas id="spaceGameCanvas" width="800" height="500"></canvas>
+                        <div id="spaceGameUI">
+                            <div id="spaceInstructions">
+                                Build: Click Tower → Click Space | Upgrade: E or Shift+Click | Pause: SPACE | 1-4: Quick Select 🛸
+                            </div>
+                        </div>
+                        <div id="spaceGameMessage" class="game-message" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>&copy; 2024 George. All rights reserved.</p>
+                <p>Built with ❤️ using HTML, CSS & JavaScript</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="space-defense.js"></script>
+</body>
+</html>
+@developer Create a personal website with:
+- My name: [George]
+- A welcome message: "Welcome to my coding portfolio!"
+- A nice background color
+- Center everything on the page

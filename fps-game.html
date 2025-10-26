@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>George's Bubble Pop Adventure</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #gameCanvas {
+            display: block;
+            cursor: none;
+        }
+
+        #gameUI {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #pointer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffeb3b, #ffc107);
+            box-shadow: 0 0 20px rgba(255, 235, 59, 0.8);
+            animation: pulse 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        #gameInfo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            font-size: 14px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+
+        #startScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            z-index: 200;
+        }
+
+        #startButton {
+            padding: 15px 30px;
+            font-size: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        #startButton:hover {
+            background: linear-gradient(45deg, #ff5252, #ffb74d);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .game-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57, #48cae4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+            animation: rainbow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(60deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="gameUI">
+            <div id="pointer"></div>
+            <div id="gameInfo">
+                <div>Score: <span id="score">0</span></div>
+                <div>Bubbles Popped: <span id="bubblesPopped">0</span></div>
+                <div>Combo: <span id="combo">0</span></div>
+            </div>
+            <div id="instructions">
+                WASD: Move | Mouse: Look Around | Click: Pop Bubbles | ESC: Pause
+            </div>
+        </div>
+
+        <div id="startScreen">
+            <h1 class="game-title">🫧 George's Bubble Pop Adventure</h1>
+            <p>Pop the magical floating bubbles to score points!</p>
+            <p>Use WASD to move and mouse to look around. Click to pop bubbles!</p>
+            <button id="startButton">Start Game</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Game variables
+        let scene, camera, renderer, controls;
+        let bubbles = [];
+        let particles = [];
+        let sparkles = [];
+        let score = 0;
+        let bubblesPopped = 0;
+        let combo = 0;
+        let gameStarted = false;
+        let mouse = { x: 0, y: 0 };
+        let keys = {};
+        let velocity = new THREE.Vector3();
+        let raycaster = new THREE.Raycaster();
+        let popSound, chimeSound;
+
+        // Game settings
+        const MOVE_SPEED = 0.1;
+        const BUBBLE_COUNT = 15;
+        const WORLD_SIZE = 50;
+
+        // Initialize the game
+        function init() {
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xE6F3FF);
+            scene.fog = new THREE.Fog(0xE6F3FF, 20, 120);
+
+            // Add floating sparkles
+            createSparkles();
+
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2, 5);
+
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            // Create lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Add colorful point lights
+            const colors = [0xff6b6b, 0xfeca57, 0x48cae4, 0xff9ff3];
+            colors.forEach((color, i) => {
+                const light = new THREE.PointLight(color, 0.3, 30);
+                light.position.set(
+                    Math.cos(i * Math.PI * 0.5) * 20,
+                    5,
+                    Math.sin(i * Math.PI * 0.5) * 20
+                );
+                scene.add(light);
+            });
+
+            // Create ground
+            const groundGeometry = new THREE.PlaneGeometry(WORLD_SIZE * 2, WORLD_SIZE * 2);
+            const groundMaterial = new THREE.MeshLambertMaterial({
+                color: 0x98FB98,
+                transparent: true,
+                opacity: 0.8
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // Create bubbles
+            createBubbles();
+
+            // Set up event listeners
+            setupEventListeners();
+
+            // Initialize audio
+            initAudio();
+
+            // Start game loop
+            animate();
+        }
+
+        function createBubbles() {
+            for (let i = 0; i < BUBBLE_COUNT; i++) {
+                createNewBubble();
+            }
+        }
+
+        function setupEventListeners() {
+            // Start button
+            document.getElementById('startButton').addEventListener('click', startGame);
+
+            // Mouse movement
+            document.addEventListener('mousemove', onMouseMove);
+
+            // Mouse click
+            document.addEventListener('click', onMouseClick);
+
+            // Keyboard events
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+
+            // Window resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Pointer lock
+            document.addEventListener('pointerlockchange', onPointerLockChange);
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            gameStarted = true;
+
+            // Request pointer lock
+            document.body.requestPointerLock();
+        }
+
+        function onMouseMove(event) {
+            if (!gameStarted) return;
+
+            mouse.x += event.movementX || 0;
+            mouse.y += event.movementY || 0;
+
+            // Rotate camera based on mouse movement
+            camera.rotation.y = -mouse.x * 0.002;
+            camera.rotation.x = -mouse.y * 0.002;
+            camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+        }
+
+        function onMouseClick(event) {
+            if (!gameStarted) return;
+
+            popBubble();
+        }
+
+        function onKeyDown(event) {
+            keys[event.code] = true;
+
+            if (event.code === 'Escape') {
+                if (document.pointerLockElement) {
+                    document.exitPointerLock();
+                } else {
+                    document.body.requestPointerLock();
+                }
+            }
+        }
+
+        function onKeyUp(event) {
+            keys[event.code] = false;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onPointerLockChange() {
+            if (!document.pointerLockElement && gameStarted) {
+                // Pointer lock lost
+            }
+        }
+
+        function popBubble() {
+            // Cast ray from camera to find bubbles
+            raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+            const intersects = raycaster.intersectObjects(bubbles);
+
+            if (intersects.length > 0) {
+                const bubble = intersects[0].object;
+                const index = bubbles.indexOf(bubble);
+                if (index > -1) {
+                    hitBubble(bubble, index);
+                }
+            }
+        }
+
+        function updateMovement() {
+            if (!gameStarted) return;
+
+            velocity.set(0, 0, 0);
+
+            if (keys['KeyW']) velocity.z -= MOVE_SPEED;
+            if (keys['KeyS']) velocity.z += MOVE_SPEED;
+            if (keys['KeyA']) velocity.x -= MOVE_SPEED;
+            if (keys['KeyD']) velocity.x += MOVE_SPEED;
+
+            // Apply rotation to movement
+            velocity.applyQuaternion(camera.quaternion);
+            velocity.y = 0; // Keep on ground
+
+            camera.position.add(velocity);
+
+            // Keep camera above ground
+            camera.position.y = Math.max(camera.position.y, 2);
+        }
+
+        function updateBubbles() {
+            bubbles.forEach(bubble => {
+                // Floating animation
+                bubble.position.y += Math.sin(Date.now() * 0.003 + bubble.userData.phase) * 0.008;
+                bubble.position.x += Math.sin(Date.now() * 0.002 + bubble.userData.phase * 0.5) * 0.003;
+                bubble.position.z += Math.cos(Date.now() * 0.0025 + bubble.userData.phase * 0.7) * 0.004;
+
+                // Gentle rotation
+                bubble.rotation.x += 0.005;
+                bubble.rotation.y += 0.003;
+
+                // Scale pulsing
+                const scale = 1 + Math.sin(Date.now() * 0.004 + bubble.userData.phase) * 0.1;
+                bubble.scale.setScalar(scale);
+            });
+        }
+
+        function hitBubble(bubble, index) {
+            // Add score with combo multiplier
+            const points = bubble.userData.points * (1 + combo * 0.1);
+            score += Math.floor(points);
+            bubblesPopped++;
+            combo++;
+            window.lastPopTime = Date.now();
+
+            // Play chime for combos
+            if (combo % 5 === 0) {
+                playChimeSound();
+            }
+
+            // Update UI
+            document.getElementById('score').textContent = score;
+            document.getElementById('bubblesPopped').textContent = bubblesPopped;
+            document.getElementById('combo').textContent = combo;
+
+            // Remove bubble
+            scene.remove(bubble);
+            bubbles.splice(index, 1);
+
+            // Create new bubble
+            setTimeout(() => {
+                createNewBubble();
+            }, 500);
+
+            // Bubble pop effect
+            createBubbleExplosion(bubble.position, bubble.userData.color);
+            playPopSound();
+        }
+
+        function createNewBubble() {
+            const isSpecial = Math.random() < 0.15; // 15% chance for special bubble
+            const size = isSpecial ? 1.2 + Math.random() * 0.8 : 0.6 + Math.random() * 0.6;
+            const bubbleGeometry = new THREE.SphereGeometry(size, 16, 16);
+
+            const hue = Math.random();
+            const saturation = isSpecial ? 1.0 : 0.8;
+            const lightness = isSpecial ? 0.8 : 0.7;
+            const color = new THREE.Color().setHSL(hue, saturation, lightness);
+
+            const bubbleMaterial = new THREE.MeshPhongMaterial({
+                color: color,
+                transparent: true,
+                opacity: isSpecial ? 0.9 : 0.8,
+                shininess: isSpecial ? 150 : 100,
+                specular: 0xffffff
+            });
+
+            const bubble = new THREE.Mesh(bubbleGeometry, bubbleMaterial);
+
+            bubble.position.set(
+                (Math.random() - 0.5) * WORLD_SIZE * 0.8,
+                Math.random() * 6 + 2,
+                (Math.random() - 0.5) * WORLD_SIZE * 0.8
+            );
+
+            bubble.castShadow = true;
+            bubble.userData = {
+                type: 'bubble',
+                points: isSpecial ? Math.floor(25 + Math.random() * 35) : Math.floor(10 + Math.random() * 20),
+                phase: Math.random() * Math.PI * 2,
+                color: color,
+                isSpecial: isSpecial
+            };
+
+            // Add glow effect for special bubbles
+            if (isSpecial) {
+                const glowGeometry = new THREE.SphereGeometry(size * 1.3, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                bubble.add(glow);
+            }
+
+            scene.add(bubble);
+            bubbles.push(bubble);
+        }
+
+        function createBubbleExplosion(position, color) {
+            for (let i = 0; i < 15; i++) {
+                const particleGeometry = new THREE.SphereGeometry(0.03 + Math.random() * 0.05, 6, 6);
+                const particleMaterial = new THREE.MeshBasicMaterial({
+                    color: color.clone().multiplyScalar(0.8 + Math.random() * 0.4),
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+
+                particle.position.copy(position);
+                particle.userData = {
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.4,
+                        Math.random() * 0.4 + 0.1,
+                        (Math.random() - 0.5) * 0.4
+                    ),
+                    life: 60,
+                    maxLife: 60
+                };
+
+                scene.add(particle);
+                particles.push(particle);
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+
+                // Move particle
+                particle.position.add(particle.userData.velocity);
+                particle.userData.velocity.y -= 0.01; // gravity
+                particle.userData.life--;
+
+                // Fade out
+                const alpha = particle.userData.life / particle.userData.maxLife;
+                particle.material.opacity = alpha;
+                particle.scale.setScalar(alpha);
+
+                // Remove if dead
+                if (particle.userData.life <= 0) {
+                    scene.remove(particle);
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function resetCombo() {
+            if (combo > 0) {
+                combo = Math.max(0, combo - 1);
+                document.getElementById('combo').textContent = combo;
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            updateMovement();
+            updateBubbles();
+            updateParticles();
+            updateSparkles();
+
+            // Reset combo after 3 seconds of inactivity
+            if (Date.now() - (window.lastPopTime || 0) > 3000) {
+                resetCombo();
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        function createSparkles() {
+            const sparkleGeometry = new THREE.SphereGeometry(0.02, 4, 4);
+
+            for (let i = 0; i < 50; i++) {
+                const sparkleMaterial = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(Math.random(), 0.8, 0.8),
+                    transparent: true,
+                    opacity: 0.6
+                });
+
+                const sparkle = new THREE.Mesh(sparkleGeometry, sparkleMaterial);
+                sparkle.position.set(
+                    (Math.random() - 0.5) * WORLD_SIZE * 2,
+                    Math.random() * 15 + 2,
+                    (Math.random() - 0.5) * WORLD_SIZE * 2
+                );
+
+                sparkle.userData = {
+                    phase: Math.random() * Math.PI * 2,
+                    speed: 0.5 + Math.random() * 0.5
+                };
+
+                scene.add(sparkle);
+                sparkles.push(sparkle);
+            }
+        }
+
+        function updateSparkles() {
+            sparkles.forEach(sparkle => {
+                if (sparkle.userData.phase !== undefined) {
+                    sparkle.position.y += Math.sin(Date.now() * 0.001 * sparkle.userData.speed + sparkle.userData.phase) * 0.02;
+                    sparkle.rotation.y += 0.02;
+
+                    // Twinkling effect
+                    sparkle.material.opacity = 0.3 + Math.sin(Date.now() * 0.005 + sparkle.userData.phase) * 0.3;
+                }
+            });
+        }
+
+        function initAudio() {
+            // Create audio context for sound effects
+            window.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playPopSound() {
+            if (!window.audioContext) return;
+
+            const oscillator = window.audioContext.createOscillator();
+            const gainNode = window.audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(window.audioContext.destination);
+
+            // Create a pleasant pop sound
+            oscillator.frequency.setValueAtTime(800 + Math.random() * 400, window.audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(200, window.audioContext.currentTime + 0.1);
+
+            gainNode.gain.setValueAtTime(0.1, window.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, window.audioContext.currentTime + 0.1);
+
+            oscillator.start(window.audioContext.currentTime);
+            oscillator.stop(window.audioContext.currentTime + 0.1);
+        }
+
+        function playChimeSound() {
+            if (!window.audioContext) return;
+
+            // Play a magical chime for combos
+            const frequencies = [523, 659, 784]; // C, E, G notes
+            frequencies.forEach((freq, i) => {
+                const oscillator = window.audioContext.createOscillator();
+                const gainNode = window.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(window.audioContext.destination);
+
+                oscillator.frequency.setValueAtTime(freq, window.audioContext.currentTime + i * 0.1);
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0, window.audioContext.currentTime + i * 0.1);
+                gainNode.gain.linearRampToValueAtTime(0.05, window.audioContext.currentTime + i * 0.1 + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, window.audioContext.currentTime + i * 0.1 + 0.3);
+
+                oscillator.start(window.audioContext.currentTime + i * 0.1);
+                oscillator.stop(window.audioContext.currentTime + i * 0.1 + 0.3);
+            });
+        }
+
+        // Initialize the game when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
