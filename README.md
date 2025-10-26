@@ -1,68 +1,62 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/a2pucUEo)
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/ZMxcIzhS)
 
-# 🎮 Gamer Assistant AI
+# 🎮 George's Portfolio Website
 
-An AI-powered chat assistant specifically designed for gamers, built with Streamlit and Groq API.
+Welcome to my personal portfolio website! I'm George, an 11-year-old grade 7 student who loves gaming and sports.
 
-## Features
+## 🌟 Features
 
-- 💬 Interactive chat interface
-- 🎮 Gaming-focused AI assistant
-- ⚡ Fast responses powered by Groq's llama-3.3-70b-versatile model
-- 🎨 Clean and user-friendly interface
-- 📝 Chat history management
+- **Hero Section**: Introduction with animated floating elements
+- **About Me**: Personal information and stats
+- **Hobbies**: Sports and gaming interests
+- **Projects**: Showcase of my coding projects including AI Gamer Assistant Chatbox
+- **Space Tower Defense Game**: Interactive browser game built with JavaScript
 
-## Setup Instructions
+## 🚀 Projects Showcase
 
-### 1. Install Dependencies
+### AI Gamer Assistant Chatbox
+An intelligent AI-powered chat assistant specifically designed for gamers, built with:
+- Python & Streamlit
+- Groq API with Llama 3.3 70B model
+- Real-time chat responses
+- Gaming strategies and recommendations
 
-```bash
-pip install -r requirements.txt
+## 🛠️ Technologies Used
+
+- **HTML5**: Structure and content
+- **CSS3**: Modern styling with gradients and animations
+- **JavaScript**: Interactive games and functionality
+- **Font Awesome**: Icons
+- **Google Fonts**: Inter font family
+
+## 📂 Project Structure
+
+```
+profile/
+├── index.html          # Main website page
+├── styles.css          # All styling
+├── script.js           # Building shooter game
+├── space-defense.js    # Space tower defense game
+├── img/                # Project screenshots
+└── README.md           # This file
 ```
 
-### 2. Configure API Key
+## 🎮 Live Demo
 
-1. Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
+Visit my website: [Coming Soon]
 
-2. Get your Groq API key from [https://console.groq.com/keys](https://console.groq.com/keys)
+## 🎯 Features
 
-3. Edit `.env` file and add your API key:
-   ```
-   GROQ_API_KEY=your_actual_api_key_here
-   ```
+- Fully responsive design (mobile, tablet, desktop)
+- Interactive games with sound effects
+- Smooth animations and transitions
+- Modern gradient designs
+- Professional project showcase
 
-### 3. Run the Application
-
-```bash
-streamlit run app.py
-```
-
-The app will open in your default browser at `http://localhost:8501`
-
-## Usage
-
-- Type your gaming-related questions in the chat input
-- Ask about game strategies, tips, recommendations, hardware advice, or troubleshooting
-- Use the "Clear Chat History" button in the sidebar to start a new conversation
-
-## What You Can Ask
-
-- Game strategies and walkthroughs
-- Game recommendations based on your preferences
-- Gaming hardware and setup advice
-- Troubleshooting gaming issues
-- Gaming news and trends
-- Tips for improving gameplay
-
-## Technologies Used
-
-- **Streamlit**: Web interface framework
-- **Groq API**: AI model provider (llama-3.3-70b-versatile)
-- **Python-dotenv**: Environment variable management
-
-## License
+## 📝 License
 
 MIT License
+
+---
+
+Built with ❤️ by George | CodeCub Student
