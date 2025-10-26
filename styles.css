@@ -412,6 +412,224 @@ section {
     gap: 2rem;
 }
 
+/* Large Project Card Layout */
+.project-card-large {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    background: white;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+    padding: 2.5rem;
+}
+
+.project-card-large:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Project Screenshot Side */
+.project-screenshot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.project-screenshot::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.screenshot-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.screenshot-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.project-card-large:hover .screenshot-container img {
+    transform: scale(1.05);
+}
+
+/* Project Info Side */
+.project-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.project-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.project-description {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Tech Stack Badges */
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.tech-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tech-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tech-badge.python {
+    background: linear-gradient(135deg, #3776ab 0%, #ffd343 100%);
+}
+
+.tech-badge.streamlit {
+    background: linear-gradient(135deg, #FF4B4B 0%, #FF6B6B 100%);
+}
+
+.tech-badge.groq {
+    background: linear-gradient(135deg, #F55036 0%, #FF8A65 100%);
+}
+
+.tech-badge.llama {
+    background: linear-gradient(135deg, #8E44AD 0%, #C39BD3 100%);
+}
+
+.tech-badge.git {
+    background: linear-gradient(135deg, #F05032 0%, #F77F6D 100%);
+}
+
+/* Project Buttons */
+.project-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-project {
+    padding: 0.875rem 1.75rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-project:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.btn-github {
+    background: linear-gradient(135deg, #24292e 0%, #424242 100%);
+    color: white;
+}
+
+.btn-github svg {
+    fill: currentColor;
+}
+
+.btn-live {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Responsive Design for Project Card */
+@media (max-width: 968px) {
+    .project-card-large {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+    }
+
+    .project-screenshot {
+        min-height: 300px;
+    }
+
+    .project-info h3 {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-card-large {
+        padding: 1.5rem;
+        gap: 1.5rem;
+    }
+
+    .project-screenshot {
+        padding: 1.5rem;
+        min-height: 250px;
+    }
+
+    .project-info h3 {
+        font-size: 1.5rem;
+    }
+
+    .project-description {
+        font-size: 0.95rem;
+    }
+
+    .btn-project {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Legacy Project Card Styles (keeping for backward compatibility) */
 .project-card {
     background: white;
     border-radius: var(--border-radius);
